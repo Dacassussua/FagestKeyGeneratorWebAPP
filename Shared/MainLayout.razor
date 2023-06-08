@@ -1,0 +1,49 @@
+﻿@using FagestKeyGenerator.WebAPP.Models;
+@inherits LayoutComponentBase
+
+@inject NavigationManager navigationManager
+@inject CustomStateProvider authStateProvider
+<div class="page">
+    <div class="sidebar">
+        @if (IsAuthenticated)
+        {
+            <NavMenu />
+        }
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <span>@AppGeneral.CurrentUserModel.normalizedUserName</span>
+            <button type="button" class="btn btn-link ml-md-auto" @onclick="@LogoutClick">Logout</button>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+@functions {
+
+
+    [CascadingParameter]
+    Task<AuthenticationState> AuthenticationState { get; set; }
+    bool IsAuthenticated { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsAuthenticated = (await AuthenticationState).User.Identity.IsAuthenticated;
+        if (!IsAuthenticated)
+        {
+
+            navigationManager.NavigateTo("/login");
+
+        }
+    }
+    async Task LogoutClick()
+    {
+        await authStateProvider.Logout();
+        navigationManager.NavigateTo("/login");
+    }
+}
+
+

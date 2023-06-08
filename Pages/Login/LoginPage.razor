@@ -1,0 +1,82 @@
+﻿@page "/login"
+@using FagestKeyGenerator.WebAPP.Models;
+@layout AuthLayout
+@inject NavigationManager navigationManager
+@inject CustomStateProvider authStateProvider
+<head>
+    <!--START LOGIN THEME-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="css/style.css" rel="stylesheet" />
+    <!--END LOGIN THEME-->
+</head>
+
+<section class="ftco-section">
+    <div class="container">
+
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="login-wrap p-4 p-md-5">
+                    <div class="icon d-flex align-items-center justify-content-center">
+                        <span class="fa fa-user-o"></span>
+                    </div>
+                    <h3 class="text-center mb-4">Acesso ao Sistema</h3>
+                    <EditForm action="#" class="login-form" OnValidSubmit="OnSubmit" Model="loginRequest">
+                        <div class="form-group">
+
+                            <InputText id="inputUsername" class="form-control rounded-left" @bind-Value="loginRequest.UserName" required placeholder="Utilizador" />
+                            <ValidationMessage For="@(() => loginRequest.UserName)" />
+
+                        </div>
+                        <div class="form-group d-flex">
+
+                            <InputText type="password" id="inputPassword" class="form-control rounded-left" required placeholder="Senha" @bind-Value="loginRequest.Password" />
+                            <ValidationMessage For="@(() => loginRequest.Password)" />
+                        </div>
+                        <div class="form-group d-md-flex">
+                            <div class="w-50">
+                                <label class="checkbox-wrap checkbox-primary">
+                                    Memorizar
+                                    <input type="checkbox" checked>
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                            <div class="w-50 text-md-right">
+                                <a href="#">Esqueci a senha</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Acessar</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    LoginRequest loginRequest { get; set; } = new LoginRequest();
+    //= new LoginRequest
+    //    {
+    //        UserName = "925805611",
+    //        Password = "123456789"
+
+    //    };
+    string error { get; set; }
+
+    async Task OnSubmit()
+    {
+        error = string.Empty;
+        try
+        {
+
+            await authStateProvider.Login(loginRequest);
+            navigationManager.NavigateTo("/home");
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+}

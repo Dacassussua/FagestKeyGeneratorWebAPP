@@ -1,0 +1,184 @@
+﻿
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="home">Fagest Admin</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="/home" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="ontoggleCustomerSubMenu">
+                <span class="oi oi-@SignCustomer" aria-hidden="true"></span> Clientes
+            </NavLink>
+        </div>
+
+        @if (IsVisibleCustomer)
+        {
+            <li class="expand p-2">
+                <ul>
+                    <li class="expand-nav-item list-unstyled">
+                        <NavLink class="nav-link" href="CustomersPage">
+                            <span class="material-icons" aria-hidden="true">trip_origin</span>Listar Clientes
+                        </NavLink>
+                    </li>
+                </ul>
+            </li>
+        }
+
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="ontoggleSuplierSubMenu">
+                <span class="oi oi-@SignSuplier" aria-hidden="true"></span> Licenças
+            </NavLink>
+        </div>
+
+        @if (IsVisibleSuplier)
+        {
+            <li class="expand p-2">
+                <ul>
+                    <li class="expand-nav-item list-unstyled">
+                        <NavLink class="nav-link" href="LicenceManagerPage">
+                            <span class="material-icons" aria-hidden="true">trip_origin</span>Gestão de Licenças
+                        </NavLink>
+                    </li>
+              
+                    <li class="expand-nav-item list-unstyled">
+                        <NavLink class="nav-link" href="HistoricoLicencas">
+                            <span class="material-icons" aria-hidden="true">trip_origin</span>Movimentos
+                        </NavLink>
+                    </li>
+                </ul>
+            </li>
+        }
+
+
+        }
+
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private bool IsVisibleProducts = false;
+    private bool IsVisibleBrands = false;
+    private bool IsVisibleUtilitarios = false;
+    private bool IsVisibleProvincy = false;
+    private bool IsVisibleCountry = false;
+    private bool IsVisibleModels = false;
+    private bool IsVisibleTax = false;
+    private bool IsVisibleTaxType = false;
+    private bool IsVisibleOrders = false;
+    private bool IsVisibleCustomer = false;
+    private bool IsVisibleSuplier = false;
+    private bool IsVisibleBanc = false;
+    private string SignProvincy = "right";
+    private string SignUtilitarios = "plus";
+    private string SignOrders = "plus";
+    private string SignProducts = "plus";
+    private string SignCustomer = "plus";
+    private string SignSuplier = "plus";
+    private string SignCountry = "right";
+    private string SignBrands = "right";
+    private string SignModels = "right";
+    private string SignTax = "right";
+    private string SignTaxType = "right";
+    private string SignBanc = "right";
+
+
+
+
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+    private void ontoggleProvincySubMenu()
+    {
+        IsVisibleProvincy = !IsVisibleProvincy;
+        SignProvincy = IsVisibleProvincy ? "bottom" : "right";
+
+    }
+
+    private void ontoggleCountrySubMenu()
+    {
+        IsVisibleCountry = !IsVisibleCountry;
+        SignCountry = IsVisibleCountry ? "bottom" : "right";
+
+    }
+    private void ontoggleUtilitariosSubMenu()
+    {
+        IsVisibleUtilitarios = !IsVisibleUtilitarios;
+        SignUtilitarios = IsVisibleUtilitarios ? "minus" : "plus";
+
+    }
+    private void ontoggleProductsSubMenu()
+    {
+        IsVisibleProducts = !IsVisibleProducts;
+        SignProducts = IsVisibleProducts ? "minus" : "plus";
+
+    }
+
+    private void ontoggleBrandsSubMenu()
+    {
+        IsVisibleBrands = !IsVisibleBrands;
+        SignBrands = IsVisibleBrands ? "bottom" : "right";
+
+    }
+    private void ontoggleModelsSubMenu()
+    {
+        IsVisibleModels = !IsVisibleModels;
+        SignModels = IsVisibleModels ? "bottom" : "right";
+
+    }
+
+    private void ontoggleTaxSubMenu()
+    {
+        IsVisibleTax = !IsVisibleTax;
+        SignTax = IsVisibleTax ? "bottom" : "right";
+
+    }
+    private void ontoggleTaxTypeSubMenu()
+    {
+        IsVisibleTaxType = !IsVisibleTaxType;
+        SignTaxType = IsVisibleTaxType ? "bottom" : "right";
+
+    }
+    private void ontoggleOrdersSubMenu()
+    {
+        IsVisibleOrders = !IsVisibleOrders;
+        SignOrders = IsVisibleOrders ? "minus" : "plus";
+    }
+    private void ontoggleCustomerSubMenu()
+    {
+        IsVisibleCustomer = !IsVisibleCustomer;
+        SignCustomer = IsVisibleCustomer ? "minus" : "plus";
+    }
+    private void ontoggleSuplierSubMenu()
+    {
+        IsVisibleSuplier = !IsVisibleSuplier;
+        SignSuplier = IsVisibleSuplier ? "minus" : "plus";
+    }
+
+    private void ontoggleBancSubMenu()
+    {
+        IsVisibleBanc = !IsVisibleBanc;
+        SignBanc = IsVisibleBanc ? "bottom" : "right";
+    }
+
+
+
+}
+

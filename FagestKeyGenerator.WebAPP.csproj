@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>disable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BlazorPro.Spinkit" Version="1.2.0" />
+		<PackageReference Include="DevExpress.Blazor" Version="22.2.6" />
+		<PackageReference Include="Microsoft.AspNetCore.Authorization" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.16" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.16" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="Models\General\" />
+	  <Folder Include="wwwroot\css\bootstrap\" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Content Update="wwwroot\css\app.css">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
+</Project>

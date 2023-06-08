@@ -1,0 +1,447 @@
+﻿@page "/HistoricoLicencas"
+@using System.Globalization;
+@using FagestKeyGenerator.WebAPP.Models.Licences;
+@using FagestKeyGenerator.WebAPP.Services.Implementation;
+
+<DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" style="border:none">
+    <DxTab Click="OnTab1Click">
+        <TabTemplate>
+            <div style="padding:10px 20px; text-align:center; border-radius:0px;
+                 background-color:@BackColorTab1; color:@ForeColorTab1">
+                @string.Format("{0}",$"Expira em {new CultureInfo("en-US", false).TextInfo.ToTitleCase(DateTime.Now.Date.ToString("MMMM"))}")
+
+            </div>
+        </TabTemplate>
+    </DxTab>
+    <DxTab Click="OnTab2Click">
+        <TabTemplate>
+            <div style="padding:10px 20px; text-align:center; border-radius:0px;
+                 background-color:@BackColorTab2; color:@ForeColorTab2">
+                @string.Format("{0}",$"Geradas em {new CultureInfo("en-US", false).TextInfo.ToTitleCase(DateTime.Now.Date.ToString("MMMM"))}")
+            </div>
+        </TabTemplate>
+    </DxTab>
+    <DxTab Click="OnTab3Click">
+        <TabTemplate>
+            <div style="padding:10px 20px; text-align:center; border-radius:0px;
+                 background-color:@BackColorTab3; color:@ForeColorTab3">
+                Listagem Geral
+            </div>
+        </TabTemplate>
+
+    </DxTab>
+</DxTabs>
+<div class="tabs-border-top-0 tabs-border-radius-top-0" style="min-height: 190px">
+    <div class="card-body">
+        @switch (ActiveTabIndex)
+        {
+
+            case 0:
+                {
+                    Task.Run(() => LoadLicenceExpireCollection());
+                    <br />
+                    <br />
+
+                    <SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+                        <LoadingTemplate>
+                            <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+                                <br />
+                                <br />
+                                <Chase Center="true" Color="#13678A" Size="50px" />
+                            </div>
+                        </LoadingTemplate>
+                    </SpinLoader>
+
+                    <DxGrid @ref="KeyLicenceGrid"
+                Data="@_collectionKey"
+                ShowGroupPanel="false"
+                ShowFilterRow="false"
+                ShowSearchBox="true"
+                EditFormButtonsVisible="false"
+                SearchBoxNullText="Digite para pesquisar"
+                PopupEditFormHeaderText="Licença">
+
+                        <Columns>
+                            <DxGridCommandColumn Width="180px">
+                                <HeaderTemplate>
+
+                                    <div>
+                                        @* <DxButton Click="() => OnAddClickEvent()" Text="Gerar Licença" RenderStyle="ButtonRenderStyle.Info" />*@
+                                    </div>
+                                </HeaderTemplate>
+                                <CellDisplayTemplate>
+                                    @{
+                                        <div>
+                                            <DxButton Click="() => OnAddClickEvent(context.DataItem)"
+                                      Text="Detalhes" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Medium" />
+                                            <DxButton Click="() => OnDeleteButtonClick(context.DataItem)"
+                                      Text="Apagar" RenderStyle="ButtonRenderStyle.Danger" />
+                                        </div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridCommandColumn>
+
+                            <DxGridDataColumn FieldName="customerId" Caption="ID da Máquina" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="customerName" Caption="Nome do Cliente" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="ativationKey" Caption="Código de Activação"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+
+                            <DxGridDataColumn FieldName="createDate" Caption="Emissão"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="endDate" Caption="Validade"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="time" Caption="Dias restantes"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="statusResult" Caption="Estado" TextAlignment="GridTextAlignment.Center"
+                                  SortOrder="GridColumnSortOrder.Descending" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FooterColumnName="customerId"
+                                   SummaryType=GridSummaryItemType.Count />
+                        </TotalSummary>
+                    </DxGrid>
+                }
+                break;
+            case 1:
+                {
+                    Task.Run(() => LoadLicenceCreatedOnCurrentMonthCollection());
+                    <br />
+                    <br />
+
+                    <SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+                        <LoadingTemplate>
+                            <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+                                <br />
+                                <br />
+                                <Chase Center="true" Color="#13678A" Size="50px" />
+                            </div>
+                        </LoadingTemplate>
+                    </SpinLoader>
+
+                    <DxGrid @ref="KeyLicenceGrid"
+                Data="@_collectionKey"
+                ShowGroupPanel="false"
+                ShowFilterRow="false"
+                ShowSearchBox="true"
+                EditFormButtonsVisible="false"
+                SearchBoxNullText="Digite para pesquisar"
+                PopupEditFormHeaderText="Licença">
+
+                        <Columns>
+                            <DxGridCommandColumn Width="180px">
+                                <HeaderTemplate>
+
+                                    <div>
+                                    </div>
+                                </HeaderTemplate>
+                                <CellDisplayTemplate>
+                                    @{
+                                        <div>
+                                            <DxButton Click="() => OnAddClickEvent(context.DataItem)"
+                                      Text="Detalhes" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Medium" />
+                                            <DxButton Click="() => OnDeleteButtonClick(context.DataItem)"
+                                      Text="Apagar" RenderStyle="ButtonRenderStyle.Danger" />
+                                        </div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridCommandColumn>
+
+                            <DxGridDataColumn FieldName="customerId" Caption="ID da Máquina" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="customerName" Caption="Nome do Cliente" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="ativationKey" Caption="Código de Activação"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+
+                            <DxGridDataColumn FieldName="createDate" Caption="Emissão"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="endDate" Caption="Validade"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="time" Caption="Dias restantes"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="statusResult" Caption="Estado" TextAlignment="GridTextAlignment.Center"
+                                  SortOrder="GridColumnSortOrder.Descending" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FooterColumnName="customerId"
+                                   SummaryType=GridSummaryItemType.Count />
+                        </TotalSummary>
+                    </DxGrid>
+                }
+                break;
+            case 2:
+                {
+                    Task.Run(() => LoadLicenceCollection());
+                    <br />
+                    <br />
+                    <SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+                        <LoadingTemplate>
+                            <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+                                <br />
+                                <br />
+                                <Chase Center="true" Color="#13678A" Size="50px" />
+                            </div>
+                        </LoadingTemplate>
+                    </SpinLoader>
+
+                    <DxGrid @ref="KeyLicenceGrid"
+                Data="@_collectionKey"
+                ShowGroupPanel="false"
+                ShowFilterRow="false"
+                ShowSearchBox="true"
+                EditFormButtonsVisible="false"
+                SearchBoxNullText="Digite para pesquisar"
+                PopupEditFormHeaderText="Licença">
+
+                        <Columns>
+                            <DxGridCommandColumn Width="180px">
+                                <HeaderTemplate>
+
+                                    <div>
+                                    </div>
+                                </HeaderTemplate>
+                                <CellDisplayTemplate>
+                                    @{
+                                        <div>
+                                            <DxButton Click="() => OnAddClickEvent(context.DataItem)"
+                                      Text="Detalhes" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Medium" />
+                                            <DxButton Click="() => OnDeleteButtonClick(context.DataItem)"
+                                      Text="Apagar" RenderStyle="ButtonRenderStyle.Danger" />
+                                        </div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridCommandColumn>
+
+                            <DxGridDataColumn FieldName="customerId" Caption="ID da Máquina" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="customerName" Caption="Nome do Cliente" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="ativationKey" Caption="Código de Activação"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+
+                            <DxGridDataColumn FieldName="createDate" Caption="Emissão"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="endDate" Caption="Validade"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+
+                            <DxGridDataColumn FieldName="time" Caption="Dias restantes"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="statusResult" Caption="Estado" TextAlignment="GridTextAlignment.Center"
+                                  SortOrder="GridColumnSortOrder.Descending" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FooterColumnName="customerId"
+                                   SummaryType=GridSummaryItemType.Count />
+                        </TotalSummary>
+                    </DxGrid>
+                }
+                break;
+
+
+        }
+    </div>
+</div>
+
+
+<DxPopup @bind-Visible="@ConfirmPopupVisible" HeaderText="Confirmação"
+         Width="auto" CloseOnOutsideClick="false">
+    Deseja eliminar definitivamente a licença <strong>@_NewkeymanagerModel.ativationKey</strong>  ?
+    <div class="dxbl-grid-confirm-dialog-buttons">
+        <DxButton Text="Cancelar " RenderStyle="ButtonRenderStyle.Secondary" Click="@OnCancelButtonClick" />
+        <DxButton Text="Confirmar" RenderStyle="ButtonRenderStyle.Danger" Click="@OnConfirmDeleteButtonClick" />
+    </div>
+</DxPopup>
+
+<DxPopup @bind-Visible="@popupKeyLicenceVisible"
+         HeaderText="Licenças"
+         Width="30%"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="false">
+    <DxFormLayout>
+
+        <DxFormLayoutItem Caption="ID da Máquina" ColSpanMd="12">
+            <DxTextBox @bind-Text="@_NewkeymanagerModel.customerId" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Nome do cliente" ColSpanMd="12">
+            <DxTextBox @bind-Text="@_NewkeymanagerModel.customerName" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Licença" ColSpanMd="12">
+            <DxTextBox @bind-Text="@_NewkeymanagerModel.ativationKey" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Validade" ColSpanMd="12">
+            <DxDateEdit @bind-Date="@_NewkeymanagerModel.endDate" ShowValidationIcon="true" ReadOnly="true" Mask="@DateTimeMask.ShortDate" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Dias activos" ColSpanMd="6">
+            <DxSpinEdit @bind-Value="@_NewkeymanagerModel.time" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem Caption="Obs" ColSpanMd="12">
+            <DxMemo @bind-Text="@_NewkeymanagerModel.obs" Rows="4" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem ColSpanMd="12">
+            <div class="float-end buttonMargin">
+
+                <DxButton Text="Fechar"
+                          Click="@(()=>OnCancelButtonClick())"
+                          RenderStyle="ButtonRenderStyle.Secondary" />
+            </div>
+        </DxFormLayoutItem>
+    </DxFormLayout>
+
+</DxPopup>
+
+@code {
+    private bool IsBusy = false;
+    private bool IsNew = false;
+    private bool ConfirmPopupVisible = false;
+    private bool popupKeyLicenceVisible = false;
+    private IGrid KeyLicenceGrid { get; set; }
+    int ActiveTabIndex { get; set; } = 0;
+    string BackColorTab1 = string.Empty;
+    string ForeColorTab1 = string.Empty;
+    string BackColorTab2 = string.Empty;
+    string BackColorTab3 = string.Empty;
+    string ForeColorTab2 = string.Empty;
+    string ForeColorTab3 = string.Empty;
+    private List<KeyManagerViewModel> collection { get; set; }
+    private List<KeyManagerResult> _collectionKey { get; set; }
+    private KeyManagerService _KeyService = new KeyManagerService();
+    private KeyManagerViewModel _keymanagerModel { get; set; }
+    private KeyManagerResult _NewkeymanagerModel { get; set; }
+    protected override void OnInitialized()
+    {
+        UpdateMenuColorOnTabClick();
+    }
+    void OnTab1Click()
+    {
+        ActiveTabIndex = 0;
+        UpdateMenuColorOnTabClick();
+    }
+    void OnTab2Click()
+    {
+        ActiveTabIndex = 1;
+        UpdateMenuColorOnTabClick();
+    }
+    void OnTab3Click()
+    {
+        ActiveTabIndex = 2;
+        UpdateMenuColorOnTabClick();
+    }
+    void UpdateMenuColorOnTabClick()
+    {
+        BackColorTab1 = BackColorTab2 = BackColorTab3 = "#EBEBF2";
+        ForeColorTab1 = ForeColorTab2 = ForeColorTab3 = "#3F8EBF";
+
+        switch (ActiveTabIndex)
+        {
+            case 0:
+                {
+                    BackColorTab1 = "#3F8EBF";
+                    ForeColorTab1 = "#FFFFFF";
+                }
+                break;
+            case 1:
+                {
+                    BackColorTab2 = "#3F8EBF";
+                    ForeColorTab2 = "#FFFFFF";
+                }
+                break;
+            case 2:
+                {
+                    BackColorTab3 = "#3F8EBF";
+                    ForeColorTab3 = "#FFFFFF";
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+    async Task LoadLicenceExpireCollection()
+    {
+        _collectionKey = new List<KeyManagerResult>();
+        _collectionKey = (await _KeyService.GetEndThisMonthAsync()).ToList();
+        StateHasChanged();
+    }
+    async Task LoadLicenceCreatedOnCurrentMonthCollection()
+    {
+        _collectionKey = new List<KeyManagerResult>();
+        _collectionKey = (await _KeyService.GetCreateThisMonthAsync()).ToList();
+        StateHasChanged();
+    }
+
+    async Task LoadLicenceCollection()
+    {
+        _collectionKey = new List<KeyManagerResult>();
+        _collectionKey = (await _KeyService.GetAllAsync()).ToList();
+        StateHasChanged();
+    }
+    void OnAddClickEvent(object DataItem = null)
+    {
+        IsBusy = true;
+        if (DataItem != null)
+        {
+
+            popupKeyLicenceVisible = true;
+            _NewkeymanagerModel = new KeyManagerResult();
+            _NewkeymanagerModel = DataItem as KeyManagerResult;
+
+        }
+        IsBusy = false;
+    }
+
+    void OnDeleteButtonClick(object DataItem = null)
+    {
+        if (DataItem != null)
+        {
+
+            ConfirmPopupVisible = true;
+            _NewkeymanagerModel = new KeyManagerResult();
+            _NewkeymanagerModel = DataItem as KeyManagerResult;
+
+        }
+    }
+
+
+
+    async void OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (KeyManagerViewModel)e.EditModel;
+        if (e.IsNew)
+        {
+            if (await _KeyService.CreateAsync(editModel))
+                collection.Add(editModel);
+        }
+        else
+        {
+            if (await _KeyService.UpdateAsync(editModel))
+            {
+                collection.Remove(editModel);
+                collection.Add(editModel);
+            }
+        }
+        await LoadLicenceCollection();
+    }
+
+
+    async void OnConfirmDeleteButtonClick()
+    {
+        var result = await _KeyService.RemoveAsync(_keymanagerModel.ativationKey);
+        if (result)
+        {
+            collection.Remove(_keymanagerModel);
+            await LoadLicenceCollection();
+
+        }
+        ConfirmPopupVisible = false;
+    }
+
+    void OnCancelButtonClick()
+    {
+        ConfirmPopupVisible = false;
+        popupKeyLicenceVisible = false;
+
+    }
+}

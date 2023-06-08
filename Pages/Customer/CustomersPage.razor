@@ -1,0 +1,241 @@
+﻿@page "/CustomersPage"
+
+
+@using DevExpress.Blazor
+@using FagestKeyGenerator.WebAPP.Models.Customer;
+@using FagestKeyGenerator.WebAPP.Services.Implementation;
+
+<style>
+    .PopupStyle {
+        min-width: 30%;
+    }
+
+    .column {
+        float: left;
+        width: 50%;
+    }
+</style>
+
+<SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+    <LoadingTemplate>
+        <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+            <br />
+            <br />
+            <Chase Center="true" Color="#13678A" Size="50px" />
+        </div>
+    </LoadingTemplate>
+</SpinLoader>
+
+<DxGrid @ref="Grid"
+        Data="@collection"
+        ShowGroupPanel="false"
+        ShowFilterRow="false"
+        ShowSearchBox="true"
+        EditFormButtonsVisible="false"
+        SearchBoxNullText="Digite para pesquisar"
+        DataItemDeleting="OnDataItemDeleting"
+        EditModelSaving="OnEditModelSaving"
+        PopupEditFormCssClass="PopupStyle"
+        EditMode="GridEditMode.PopupEditForm"
+        PopupEditFormHeaderText="Cliente">
+
+    <Columns>
+        <DxGridCommandColumn Width="15%">
+            <HeaderTemplate>
+                <div>
+                    <DxButton Click="() => OnAddClickEvent()" Text="Adicionar" RenderStyle="ButtonRenderStyle.Info" />
+                </div>
+            </HeaderTemplate>
+            <CellDisplayTemplate>
+                @{
+                    <div>
+                        <DxButton Click="() => OnAddClickEvent(context.DataItem)"
+                              Text="Alterar" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Medium" />
+
+                        <DxButton Click="() => OnDeleteButtonClick(context.DataItem)"
+                              Text="Apagar" RenderStyle="ButtonRenderStyle.Danger" />
+
+                    </div>
+                }
+            </CellDisplayTemplate>
+        </DxGridCommandColumn>
+
+
+        <DxGridDataColumn FieldName="customerId" Caption="Id da Máquina" Width="200px" />
+        <DxGridDataColumn FieldName="customerName" Caption="Nome da Empresa"
+                          SortOrder="GridColumnSortOrder.Descending" />  
+        <DxGridDataColumn FieldName="customerResponsavel" Caption="Responsável"
+                          SortOrder="GridColumnSortOrder.Descending" />
+        <DxGridDataColumn FieldName="customerNIF" Caption="Nº Contribuínte"
+                          SortOrder="GridColumnSortOrder.Descending" />
+        <DxGridDataColumn FieldName="customerContact" Caption="Telefone"
+                          SortOrder="GridColumnSortOrder.Descending" />
+        <DxGridDataColumn FieldName="customerEmail" Caption="Email"
+                          SortOrder="GridColumnSortOrder.Descending" />
+    </Columns>
+    <TotalSummary>
+        <DxGridSummaryItem FooterColumnName="customerId"
+                           SummaryType=GridSummaryItemType.Count />
+    </TotalSummary>
+
+    <EditFormTemplate Context="EditFormContext">
+
+        @{
+            var model = (CustomerViewModel)EditFormContext.EditModel;
+        }
+        <DxFormLayout>
+            <DxFormLayoutItem Caption="Id da Máquina" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerId" ShowValidationIcon="true" />
+            </DxFormLayoutItem>     
+            <DxFormLayoutItem Caption="Nome da Empresa" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerName" ShowValidationIcon="true" />
+            </DxFormLayoutItem>    
+            <DxFormLayoutItem Caption="Responsável" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerResponsavel" ShowValidationIcon="true" />
+            </DxFormLayoutItem>    
+            <DxFormLayoutItem Caption="Nº Contribuínte" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerNIF" ShowValidationIcon="true" />
+            </DxFormLayoutItem>     
+            <DxFormLayoutItem Caption="Telefone" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerContact" ShowValidationIcon="true" />
+            </DxFormLayoutItem>  
+            <DxFormLayoutItem Caption="Email" ColSpanMd="12">
+                <DxTextBox @bind-Text="@model.customerEmail" ShowValidationIcon="true" />
+            </DxFormLayoutItem>
+
+            <DxFormLayoutItem ColSpanMd="12">
+                <div class="float-end buttonMargin">
+                    <DxButton Text="Guardar" SubmitFormOnClick="true" RenderStyle="ButtonRenderStyle.Info" SizeMode="SizeMode.Medium" />
+                    <DxButton Text="Fechar" Click="@(()=>Grid.CancelEditAsync())" RenderStyle="ButtonRenderStyle.Secondary" />
+                </div>
+            </DxFormLayoutItem>
+
+
+        </DxFormLayout>
+
+    </EditFormTemplate>
+</DxGrid>
+
+
+<DxPopup @bind-Visible="@popupConfirmMessageVisible" HeaderText="Confirmação"
+         Width="auto" CloseOnOutsideClick="false">
+    Deseja eliminar definitivamente a empresa <strong>@_entityModel.customerName</strong>  ?
+    <div class="dxbl-grid-confirm-dialog-buttons">
+        <DxButton Text="Cancelar " RenderStyle="ButtonRenderStyle.Success" Click="@OnCancelConfirmMessageButtonClick" />
+        <DxButton Text="Confirmar" RenderStyle="ButtonRenderStyle.Danger" Click="@OnAcepteConfirmMessageButtonClick" />
+    </div>
+</DxPopup>
+
+
+@code {
+
+    private bool popupConfirmMessageVisible { get; set; } = false;
+    private bool popupKeyLicenceVisible { get; set; } = false;
+    private CustomerViewModel _entityModel { get; set; }
+    private bool IsBusy = false;
+    IGrid Grid { get; set; }
+    List<CustomerViewModel> collection { get; set; }
+    private CustomerService _Service = new CustomerService();
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        _entityModel = new CustomerViewModel();
+        await LoadCollection();
+        IsBusy = false;
+    }
+    async Task LoadCollection()
+    {
+        collection = new List<CustomerViewModel>();
+        collection = (await _Service.GetAllAsync()).ToList();
+        StateHasChanged();
+    }
+
+    void OnAddClickEvent(object DataItem = null)
+    {
+        IsBusy = true;
+        if (DataItem == null)
+        {
+            Grid.StartEditNewRowAsync();
+        }
+        else
+        {
+            Grid.StartEditDataItemAsync(DataItem);
+        }
+        IsBusy = false;
+    }  
+    
+    //void OnAddKeyLicenceClickEvent(object DataItem = null)
+    //{
+    //    popupKeyLicenceVisible = true;
+    //}
+
+    async void OnDataItemDeleting(GridDataItemDeletingEventArgs e)
+    {
+        var editModel = e.DataItem as CustomerViewModel;
+
+        if (await _Service.RemoveAsync(editModel.customerId))
+            collection.Remove(editModel);
+
+        await LoadCollection();
+
+    }
+
+    async void OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (CustomerViewModel)e.EditModel;
+        if (e.IsNew)
+        {
+            if (string.IsNullOrEmpty(editModel.customerContact))
+                editModel.customerContact = string.Empty;
+            if (string.IsNullOrEmpty(editModel.customerEmail))
+                editModel.customerEmail = string.Empty;
+            editModel.status = "V";
+            if (await _Service.CreateAsync(editModel))
+                collection.Add(editModel);
+        }
+        else
+        {
+            if (await _Service.UpdateAsync(editModel))
+            {
+                collection.Remove(editModel);
+                collection.Add(editModel);
+            }
+        }
+        await LoadCollection();
+
+    }
+
+    void OnDeleteButtonClick(object DataItem = null)
+    {
+        _entityModel = new CustomerViewModel();
+        _entityModel = DataItem as CustomerViewModel;
+        popupConfirmMessageVisible = true;
+    }
+
+    void OnAcepteConfirmMessageButtonClick()
+    {
+        //forecasts.Remove(forecasts.Find(m => m.counter == id));
+        //myGrid.Reload();
+        popupConfirmMessageVisible = false;
+        popupKeyLicenceVisible = false;
+    }  
+    
+    //void OnConfirmKeyLicenceButtonClick()
+    //{
+    //    //forecasts.Remove(forecasts.Find(m => m.counter == id));
+    //    //myGrid.Reload();
+    //    popupConfirmMessageVisible = false;
+    //    popupKeyLicenceVisible = false;
+    //}
+
+    void OnCancelConfirmMessageButtonClick()
+    {
+        popupConfirmMessageVisible = false;
+        popupKeyLicenceVisible = false;
+    } 
+    //void OnCancelKeyLicenceButtonClick()
+    //{
+    //    popupConfirmMessageVisible = false;
+    //    popupKeyLicenceVisible = false;
+    //}
+}

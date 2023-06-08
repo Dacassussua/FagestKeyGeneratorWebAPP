@@ -1,0 +1,14 @@
+﻿@page "/home"
+
+<AuthorizeView>
+    <Authorized>
+ @*       <h1>Bem vindo @context.User.Identity.Name !!!</h1>*@
+
+ 
+@*
+        <SurveyPrompt Title="How is Blazor working for you?" />*@
+    </Authorized>
+    <Authorizing>
+        <h1>Carregando...</h1>
+    </Authorizing>
+</AuthorizeView>

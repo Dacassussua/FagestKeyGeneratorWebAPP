@@ -1,0 +1,548 @@
+﻿@page "/LicenceManagerPage"
+@using FagestKeyGenerator.WebAPP.Models.Customer;
+@using FagestKeyGenerator.WebAPP.Models.Licences;
+@using FagestKeyGenerator.WebAPP.Services.Implementation;
+@using DevExpress.Blazor
+
+
+
+<style>
+    .PopupStyle {
+        min-width: 30%;
+    }
+
+    .column {
+        float: left;
+        width: 50%;
+    }
+</style>
+
+
+<DxTabs @bind-ActiveTabIndex="@ActiveTabIndex" style="border:none">
+    <DxTab Click="OnTab1Click">
+        <TabTemplate>
+            <div style="padding:10px 20px; text-align:center; border-radius:0px;
+                 background-color:@BackColorTab1; color:@ForeColorTab1">
+                Licenças
+            </div>
+        </TabTemplate>
+    </DxTab>
+    <DxTab Click="OnTab2Click">
+        <TabTemplate>
+            <div style="padding:10px 20px; text-align:center; border-radius:0px;
+                 background-color:@BackColorTab2; color:@ForeColorTab2">
+                Gerar Nova Licença
+            </div>
+        </TabTemplate>
+
+    </DxTab>
+</DxTabs>
+<div class="tabs-border-top-0 tabs-border-radius-top-0" style="min-height: 190px">
+    <div class="card-body">
+        @switch (ActiveTabIndex)
+        {
+
+            case 0:
+                {
+                    Task.Run(() => LoadLicenceCollection());
+                    <br />
+                    <br />
+
+                    <SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+                        <LoadingTemplate>
+                            <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+                                <br />
+                                <br />
+                                <Chase Center="true" Color="#13678A" Size="50px" />
+                            </div>
+                        </LoadingTemplate>
+                    </SpinLoader>
+
+                    <DxGrid @ref="KeyLicenceGrid"
+                Data="@_collectionKey"
+                ShowGroupPanel="false"
+                ShowFilterRow="false"
+                ShowSearchBox="true"
+                EditFormButtonsVisible="false"
+                SearchBoxNullText="Digite para pesquisar"
+                EditModelSaving="OnEditModelSaving"
+                PopupEditFormCssClass="PopupStyle"
+                EditMode="GridEditMode.PopupEditForm"
+                PopupEditFormHeaderText="Licença">
+
+                        <Columns>
+                            <DxGridCommandColumn Width="180px">
+                                <HeaderTemplate>
+
+                                    <div>
+                                        @* <DxButton Click="() => OnAddClickEvent()" Text="Gerar Licença" RenderStyle="ButtonRenderStyle.Info" />*@
+                                    </div>
+                                </HeaderTemplate>
+                                <CellDisplayTemplate>
+                                    @{
+                                        <div>
+                                            <DxButton Click="() => OnAddClickEvent(context.DataItem)"
+                                      Text="Detalhes" RenderStyle="ButtonRenderStyle.Secondary" SizeMode="SizeMode.Medium" />
+                                            <DxButton Click="() => OnDeleteButtonClick(context.DataItem)"
+                                      Text="Apagar" RenderStyle="ButtonRenderStyle.Danger" />
+                                        </div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridCommandColumn>
+
+                            <DxGridDataColumn FieldName="customerId" Caption="ID da Máquina" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="ativationKey" Caption="Código de Activação"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="createDate" Caption="Emissão"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="endDate" Caption="Validade"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" DisplayFormat="d" />
+                            <DxGridDataColumn FieldName="time" Caption="Dias restantes"
+                                  SortOrder="GridColumnSortOrder.Descending" TextAlignment="GridTextAlignment.Center" />
+                            <DxGridDataColumn FieldName="statusResult" Caption="Estado" TextAlignment="GridTextAlignment.Center"
+                                  SortOrder="GridColumnSortOrder.Descending" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FooterColumnName="customerId"
+                                   SummaryType=GridSummaryItemType.Count />
+                        </TotalSummary>
+
+
+                        <EditFormTemplate Context="EditFormContext">
+
+                            @{
+                                var model = (KeyManagerResult)EditFormContext.EditModel;
+                            }
+                            <DxFormLayout>
+                                <DxFormLayoutItem Caption="Id da Máquina" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@model.customerId" ShowValidationIcon="true" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Licença" ColSpanMd="12">
+                                    <DxTextBox @bind-Text="@model.ativationKey" ShowValidationIcon="true" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Data de validade" ColSpanMd="12">
+                                    <DxDateEdit @bind-Date="@model.endDate" ShowValidationIcon="true" ReadOnly="true" Mask="@DateTimeMask.ShortDate" />
+                                </DxFormLayoutItem>
+                                <DxFormLayoutItem Caption="Dias activos" ColSpanMd="12">
+                                    <DxSpinEdit @bind-Value="@model.time" ShowValidationIcon="true" />
+                                </DxFormLayoutItem>
+
+                                <DxFormLayoutItem Caption="Activo" ColSpanMd="12">
+                                    <DxCheckBox CheckType="CheckType.Switch"
+                                    @bind-Checked="@Value"
+                                    Alignment="CheckBoxContentAlignment.Left" style="color:cornflowerblue border: 0px solid silver" />
+                                </DxFormLayoutItem>
+
+              
+
+
+                                <DxFormLayoutItem ColSpanMd="12">
+                                    <div class="float-end buttonMargin">
+                                        <DxButton Text="Fechar" Click="@(()=>KeyLicenceGrid.CancelEditAsync())" RenderStyle="ButtonRenderStyle.Secondary" />
+                                    </div>
+                                </DxFormLayoutItem>
+
+                            </DxFormLayout>
+
+                        </EditFormTemplate>
+                    </DxGrid>
+                }
+                break;
+            case 1:
+                {
+                    Task.Run(() => LoadCustomerCollection());
+                    <br />
+                    <br />
+                    <SpinLoader IsLoading="IsBusy" Spinner="SpinnerType.Chase">
+                        <LoadingTemplate>
+                            <div class="col-12" style="background-color:transparent; height:50px; vertical-align:middle">
+                                <br />
+                                <br />
+                                <Chase Center="true" Color="#13678A" Size="50px" />
+                            </div>
+                        </LoadingTemplate>
+                    </SpinLoader>
+
+
+                    <DxGrid @ref="CustomerGrid"
+                Data="@Customercollection"
+                ShowGroupPanel="false"
+                ShowFilterRow="false"
+                ShowSearchBox="true"
+                EditFormButtonsVisible="false"
+                SearchBoxNullText="Digite para pesquisar"
+                EditModelSaving="OnEditModelSaving"
+                PopupEditFormCssClass="PopupStyle"
+                EditMode="GridEditMode.PopupEditForm"
+                PopupEditFormHeaderText="Cliente">
+                        <Columns>
+                            <DxGridCommandColumn Width="10%">
+                                <HeaderTemplate>
+                                    <div>
+                                    </div>
+                                </HeaderTemplate>
+                                <CellDisplayTemplate>
+                                    @{
+                                        <div>
+                                            <DxButton Click="() => OnAddKeyLicenceClickEvent(context.DataItem)"
+                                      Text="Nova Licença" RenderStyle="ButtonRenderStyle.Info" SizeMode="SizeMode.Medium" />
+                                        </div>
+                                    }
+                                </CellDisplayTemplate>
+                            </DxGridCommandColumn>
+
+                            <DxGridDataColumn FieldName="customerId" Caption="Id da Máquina" Width="200px" />
+                            <DxGridDataColumn FieldName="customerName" Caption="Nome da Empresa"
+                                  SortOrder="GridColumnSortOrder.Descending" />
+                        </Columns>
+                        <TotalSummary>
+                            <DxGridSummaryItem FooterColumnName="customerId"
+                                   SummaryType=GridSummaryItemType.Count />
+                        </TotalSummary>
+
+                    </DxGrid>
+                }
+
+
+
+                break;
+
+        }
+    </div>
+</div>
+
+<DxPopup @bind-Visible="@ConfirmPopupVisible" HeaderText="Confirmação"
+         Width="20%" CloseOnOutsideClick="false">
+    <DxFormLayout>
+
+        <DxFormLayoutItem ColSpanMd="12" Caption="Deseja eliminar definitivamente a licença:" CaptionPosition="CaptionPosition.Vertical" />
+ 
+        <strong style="padding:5%">
+            @_keymanagerModel.ativationKey?
+        </strong>  
+        <DxFormLayoutItem ColSpanMd="12" Caption="obs" CaptionPosition="CaptionPosition.Vertical">
+            <DxMemo @bind-Text="@_keymanagerModel.obs" Rows="4" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem ColSpanMd="12" >
+            <div class="dxbl-grid-confirm-dialog-buttons float-end">
+                <DxButton Text="Cancelar " RenderStyle="ButtonRenderStyle.Secondary" Click="@OnCancelButtonClick" />
+                <DxButton Text="Confirmar" RenderStyle="ButtonRenderStyle.Danger" Click="@OnConfirmDeleteButtonClick" />
+            </div>
+        </DxFormLayoutItem>
+    </DxFormLayout>
+</DxPopup>
+
+
+
+<DxPopup @bind-Visible="@popupKeyLicenceVisible"
+         HeaderText="Licenças"
+         Width="30%"
+         CloseOnOutsideClick="false"
+         ShowCloseButton="false">
+    <DxFormLayout>
+
+        <DxFormLayoutItem Caption="ID da Máquina" ColSpanMd="12">
+            <DxTextBox @bind-Text="@_NewkeymanagerModel.customerId" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem Caption="Planos" ColSpanMd="12">
+
+            <DxComboBox Data="@PlanosCollection"
+                        AllowUserInput="true"
+                        NullText="Selecione um plano ..."
+                        @bind-Text="@_planosModel.Description"
+                        TextFieldName="@nameof(_planosModel.Description)"
+                        ValueChanged="@((PlanoViewModel _planoModel) => SelectedPlanosChanged(_planoModel))" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem Caption="Data de validade" ColSpanMd="12">
+            <DxDateEdit Date="@_NewkeymanagerModel.endDate" ShowValidationIcon="true" ReadOnly="true" Mask="@DateTimeMask.ShortDate" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Dias extras" ColSpanMd="6">
+            <DxSpinEdit Value="@DiasExtras" ShowValidationIcon="true" ValueChanged="@((int newvalue)=>onkeyupExtraDayChangeEvent(newvalue))" />
+        </DxFormLayoutItem>
+        <DxFormLayoutItem Caption="Dias activos" ColSpanMd="6">
+            <DxSpinEdit @bind-Value="@_NewkeymanagerModel.time" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem Caption="Obs" ColSpanMd="12">
+            <DxMemo @bind-Text="@_NewkeymanagerModel.obs" Rows="4" ShowValidationIcon="true" />
+        </DxFormLayoutItem>
+
+        <DxFormLayoutItem ColSpanMd="12">
+            <div class="float-end buttonMargin">
+                <DxButton Text="Guardar"
+                          SubmitFormOnClick="true"
+                          RenderStyle="ButtonRenderStyle.Info"
+                          SizeMode="SizeMode.Medium"
+                          Click="@OnSaveNewKeyButtonClick" />
+
+                <DxButton Text="Fechar"
+                          Click="@(()=>OnCancelButtonClick())"
+                          RenderStyle="ButtonRenderStyle.Secondary" />
+            </div>
+        </DxFormLayoutItem>
+    </DxFormLayout>
+
+</DxPopup>
+
+@code {
+        bool Value { get; set; }
+
+    string GetText() {
+        if (Value) return "Checked";
+        else return "Unchecked";
+    }
+
+
+    bool SilentMode { get; set; } = false;
+    private bool IsBusy = false;
+    private bool IsNew = false;
+    private bool Checked { get; set; } =false;
+    private bool Enabled { get; set; } = true;
+    private int ActiveTabIndex { get; set; } = 0;
+    private string AlertMessage { get; set; }
+    private string BackColorTab1 = string.Empty;
+    private string ForeColorTab1 = string.Empty;
+    private string BackColorTab2 = string.Empty;
+    private string ForeColorTab2 = string.Empty;
+    private bool ConfirmPopupVisible { get; set; } = false;
+    private IGrid KeyLicenceGrid { get; set; }
+    private IGrid CustomerGrid { get; set; }
+    private bool popupKeyLicenceVisible { get; set; } = false;
+    private List<KeyManagerResult> collection { get; set; }
+    private List<KeyManagerResult> _collectionKey { get; set; }
+
+    private List<PlanoViewModel> PlanosCollection { get; set; }
+    private KeyManagerService _KeyService = new KeyManagerService();
+    private KeyManagerResult _keymanagerModel { get; set; }
+    private NewKeyManagerViewModel _NewkeymanagerModel { get; set; }
+    private List<CustomerViewModel> Customercollection { get; set; }
+    private CustomerService _CustomerService = new CustomerService();
+    private CustomerViewModel _customerModel { get; set; }
+    private PlanoViewModel _planosModel;
+    private int time = 0;
+    private int timePlain = 0;
+    private int DiasExtras = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        IsBusy = true;
+        _keymanagerModel = new KeyManagerResult();
+        _customerModel = new CustomerViewModel();
+        _NewkeymanagerModel = new NewKeyManagerViewModel();
+
+        await LoadLicenceCollection();
+        UpdateMenuColorOnTabClick();
+        LoadPlanosCollection();
+        IsBusy = false;
+    }
+    void CheckedChanged(bool value)
+    {
+        SilentMode = value;
+        Enabled = !value;
+    }
+    async Task LoadCustomerCollection()
+    {
+        Customercollection = new List<CustomerViewModel>();
+        Customercollection = (await _CustomerService.GetAllAsync()).ToList();
+        StateHasChanged();
+    }
+
+    void OnAddKeyLicenceClickEvent(object DataItem = null)
+    {
+        var customer = DataItem as CustomerViewModel;
+        _NewkeymanagerModel = new NewKeyManagerViewModel();
+        _NewkeymanagerModel.customerId = (customer ?? new CustomerViewModel()).customerId;
+        _NewkeymanagerModel.endDate = DateTime.Now.Date;
+
+        popupKeyLicenceVisible = true;
+    }
+
+
+
+
+    void LoadPlanosCollection()
+    {
+        _planosModel = new PlanoViewModel();
+        PlanosCollection = new List<PlanoViewModel>
+
+        {
+        new PlanoViewModel
+        {
+            Id=1,
+            Description="Mensal",
+            time=30
+        },
+        new PlanoViewModel
+        {
+            Id=1,
+            Description="Bimensal",
+            time=60
+        }
+        ,
+        new PlanoViewModel
+        {
+            Id=1,
+            Description="Trimestral",
+            time=90
+        }
+        ,
+        new PlanoViewModel
+        {
+            Id=1,
+            Description="Semestral",
+            time=180
+        }
+        ,
+        new PlanoViewModel
+        {
+            Id=1,
+            Description="Anual",
+            time=365
+        }
+        };
+
+        IsBusy = false;
+        StateHasChanged();
+    }
+    void onkeyupExtraDayChangeEvent(int newvalue)
+    {
+
+        calculateValidateTime(newvalue);
+    }
+    void SelectedPlanosChanged(object model)
+    {
+
+        timePlain = (model as PlanoViewModel).time;
+        calculateValidateTime(0);
+    }
+
+    void calculateValidateTime(int newtime)
+    {
+        _NewkeymanagerModel.time = newtime + timePlain;
+        _NewkeymanagerModel.endDate = DateTime.Now.Date.AddDays(Convert.ToInt32(_NewkeymanagerModel.time));
+        StateHasChanged();
+    }
+    async Task LoadLicenceCollection()
+    {
+        _collectionKey = new List<KeyManagerResult>();
+        _collectionKey = (await _KeyService.GetAllAsync()).ToList();
+        StateHasChanged();
+    }
+
+    void OnAddClickEvent(object DataItem = null)
+    {
+        IsBusy = true;
+        if (DataItem == null)
+        {
+            IsNew = true;
+
+            KeyLicenceGrid.StartEditNewRowAsync();
+        }
+        else
+        {
+            IsNew = false;
+            KeyLicenceGrid.StartEditDataItemAsync(DataItem);
+        }
+        IsBusy = false;
+    }
+
+
+
+    async void OnEditModelSaving(GridEditModelSavingEventArgs e)
+    {
+        var editModel = (KeyManagerResult)e.EditModel;
+        if (e.IsNew)
+        {
+            if (await _KeyService.CreateAsync(editModel))
+                collection.Add(editModel);
+        }
+        else
+        {
+            if (await _KeyService.UpdateAsync(editModel))
+            {
+                collection.Remove(editModel);
+                collection.Add(editModel);
+            }
+        }
+        await LoadLicenceCollection();
+
+    }
+
+
+    void OnDeleteButtonClick(object DataItem = null)
+    {
+        _keymanagerModel = new KeyManagerResult();
+        _keymanagerModel = DataItem as KeyManagerResult;
+        ConfirmPopupVisible = true;
+    }
+
+    async void OnConfirmDeleteButtonClick()
+    {
+        var result = await _KeyService.RemoveAsync(_keymanagerModel.ativationKey);
+        if (result)
+        {
+            collection.Remove(_keymanagerModel);
+            await LoadLicenceCollection();
+
+        }
+        ConfirmPopupVisible = false;
+    }
+
+    async void OnSaveNewKeyButtonClick()
+    {
+        AlertMessage = "Impossível gerar a licença para o cliente selecionado";
+        if (!string.IsNullOrEmpty(_NewkeymanagerModel.customerId) && _NewkeymanagerModel.time >= 0)
+        {
+            if (string.IsNullOrEmpty(_NewkeymanagerModel.obs))
+                _NewkeymanagerModel.obs = "";
+
+            var response = await _KeyService.CreateAsync(_NewkeymanagerModel);
+            AlertMessage = "Licença gerada com sucesso";
+        }
+
+        ConfirmPopupVisible = false;
+        popupKeyLicenceVisible = false;
+    }
+    void OnCancelButtonClick()
+    {
+        ConfirmPopupVisible = false;
+        popupKeyLicenceVisible = false;
+    }
+
+    void OnTab1Click()
+    {
+        ActiveTabIndex = 0;
+        UpdateMenuColorOnTabClick();
+    }
+    void OnTab2Click()
+    {
+        ActiveTabIndex = 1;
+        UpdateMenuColorOnTabClick();
+    }
+    void UpdateMenuColorOnTabClick()
+    {
+        BackColorTab1 = BackColorTab2 = "#EBEBF2";
+        ForeColorTab1 = ForeColorTab2 = "#3F8EBF";
+
+        switch (ActiveTabIndex)
+        {
+            case 0:
+                {
+                    BackColorTab1 = "#3F8EBF";
+                    ForeColorTab1 = "#FFFFFF";
+                }
+                break;
+            case 1:
+                {
+                    BackColorTab2 = "#3F8EBF";
+                    ForeColorTab2 = "#FFFFFF";
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
+}
