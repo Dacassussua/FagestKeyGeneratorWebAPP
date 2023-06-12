@@ -1,33 +1,35 @@
-name: fagest-production
+name: FagestProduction
 
 on:
-    push:
-        branches: [main]
+  push:
+    branches:
+      - main
 
 jobs:
-    deploy-to-github-pages:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
+  build:
+    runs-on: ubuntu-latest
 
-            - name: Setup .NET Core SDK
-              uses: actions/setup-dotnet@v3.2.0
-              with:
-                  dotnet-version: 6.x
-                  include-prerelease: true
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-            - name: Publish .NET Core Project
-              run: dotnet publish FagestKeyGeneratorWebAPP/FagestKeyGenerator.WebAPP.csproj -c Release -o release --nologo
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3.2.0
+    
+    - name: Restore dependencies
+      run: dotnet restore
 
-            - name: copy index.html to 404.html
-              run: cp release/wwwroot/index.html release/wwwroot/404.html
+    - name: Build
+      run: dotnet build --configuration Release
 
-            - name: Add .nojekyll file
-              run: touch release/wwwroot/.nojekyll
+    # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
 
-            - name: Commit wwwroot to GitHub Pages
-              uses: Dacassussua/FagestKeyGeneratorWebAPP
-              with:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BRANCH: gh-pages
-                  FOLDER: release/wwwroot
+    - name: Test
+      run: dotnet test --configuration Release --no-restore
+
+    # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
+
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish
+
+    # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
