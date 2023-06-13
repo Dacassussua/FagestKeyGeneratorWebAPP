@@ -31,5 +31,4 @@ jobs:
 
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish
-
     # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
