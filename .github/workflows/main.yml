@@ -1,42 +1,38 @@
 name: FagestProduction
-
 on:
-  push:
-    branches:
-      - main
+    push:
+        branches: [main]
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    deploy-to-github-pages:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3.2.0
-    
-    - name: Restore dependencies
-      run: dotnet restore
-     
-    - name: Build
-      run: dotnet build --configuration Release
-
-    # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
-
-    - name: Test
-      run: dotnet test --configuration Release --no-restore
-
-    - name: Add DevExpress
-      run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p c1T5lKEk4aNqKHFmGc3dhRvEeOX4eeFwyLsoTBtLEJOK4l7nkP
+            - name: Setup .NET Core SDK
+              uses: actions/setup-dotnet@v1
+              with:
+                  dotnet-version: 6.x
+                  include-prerelease: true
+                  
+            - name: Add DevExpress
+              run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p c1T5lKEk4aNqKHFmGc3dhRvEeOX4eeFwyLsoTBtLEJOK4l7nkP
+                  
+            - name: Add DevExpresspackages
+              run: dotnet add FagestKeyGenerator.WebAPP.csproj package DevExpress.Blazor -v 22.2.6
       
-    # Adicione outros passos relevantes ao seu fluxo de trabalho aqui
-    - name: Add DevExpresspackages
-      run: dotnet add FagestKeyGenerator.WebAPP.csproj package DevExpress.Blazor -v 22.2.6
-      
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish
-      
-      
+            - name: Publish .NET Core Project
+              run: dotnet publish src/FagestKeyGeneratorWebAPP/FagestKeyGenerator.WebAPP.csproj -c Release -o release --nologo
 
+            - name: copy index.html to 404.html
+              run: cp release/wwwroot/index.html release/wwwroot/404.html
 
-  
+            - name: Commit wwwroot to GitHub Pages
+              uses: Dacassussua/FagestKeyGeneratorWebAPP@3.7.1
+              with:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  BRANCH: gh-pages
+                  FOLDER: release/wwwroot
+                  
+            - name: Publish
+              run: dotnet publish --configuration Release --output ./publish
