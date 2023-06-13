@@ -18,6 +18,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
       
+     - name: Add DevExpress
+     run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p c1T5lKEk4aNqKHFmGc3dhRvEeOX4eeFwyLsoTBtLEJOK4l7nkP
+
+  - name: Add packages to project
+      run: dotnet add FagestKeyGenerator.WebAPP.csproj package DevExpress.Blazor -v 22.2.6
+
     - name: Build
       run: dotnet build --configuration Release
 
@@ -30,6 +36,8 @@ jobs:
 
     - name: Publish
       run: dotnet publish --configuration Release --output ./publish
+      
+      
 
 
   
