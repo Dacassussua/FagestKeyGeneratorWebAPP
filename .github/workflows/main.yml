@@ -15,7 +15,7 @@ jobs:
                   include-prerelease: true
                   
             - name: Add DevExpress
-              run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p c1T5lKEk4aNqKHFmGc3dhRvEeOX4eeFwyLsoTBtLEJOK4l7nkP
+              run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p 4.4ng0l4
                   
             - name: Add DevExpresspackages
               run: dotnet add FagestKeyGenerator.WebAPP.csproj package DevExpress.Blazor -v 22.2.6
