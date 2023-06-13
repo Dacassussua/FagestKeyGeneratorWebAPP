@@ -19,7 +19,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Add NuGet source
-      run: https://nuget.devexpress.com/c1T5lKEk4aNqKHFmGc3dhRvEeOX4eeFwyLsoTBtLEJOK4l7nkP/api
+      run: https://nuget.devexpress.com
     - name: Build
       run: dotnet build --configuration Release
 
