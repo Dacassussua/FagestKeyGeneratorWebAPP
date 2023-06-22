@@ -45,7 +45,6 @@
                             </div>
                         </div>
                         <div class="form-group">
-
                             <button type="submit" class="btn btn-primary rounded submit p-3 px-5">Acessar</button>
                         </div>
                     </EditForm>
@@ -70,7 +69,7 @@
         error = string.Empty;
         try
         {
-
+            //Login on Submit Button
             await authStateProvider.Login(loginRequest);
             navigationManager.NavigateTo("/home");
         }
